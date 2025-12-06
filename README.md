@@ -13,6 +13,13 @@
   - 安装 Docker
   - 配置代理 alias
 
+- **init_docker_proxy.sh** - 配置 Docker 代理设置
+  - 创建 systemd 服务目录
+  - 配置 HTTP/HTTPS 代理
+  - 配置 NO_PROXY 环境变量
+  - 重载 systemd 并重启 Docker
+  - 验证配置是否生效
+
 ## 📥 如何下载脚本
 
 ### 方法一：使用 curl 直接下载并执行
@@ -81,6 +88,38 @@ sudo bash init_lxc_noble.sh
 - 部分操作（如设置默认 shell）在 LXC 环境中可能受限
 - 执行完成后建议重新登录终端以生效所有配置
 
+### init_docker_proxy.sh
+
+用于配置 Docker 的 HTTP/HTTPS 代理设置，适用于需要通过代理访问 Docker Hub 或其他镜像仓库的场景。
+
+**功能包括：**
+- ✅ 创建 Docker systemd 服务配置目录
+- ✅ 配置 HTTP_PROXY 和 HTTPS_PROXY 环境变量
+- ✅ 配置 NO_PROXY 环境变量（排除内网地址）
+- ✅ 自动备份现有配置文件
+- ✅ 重载 systemd 并重启 Docker 服务
+- ✅ 验证配置是否生效
+
+**使用方法：**
+
+```bash
+# 使用默认代理地址（127.0.0.1:7890）
+sudo bash init_docker_proxy.sh
+
+# 或通过环境变量自定义代理地址
+sudo HTTP_PROXY=http://proxy.example.com:8080/ \
+     HTTPS_PROXY=http://proxy.example.com:8080/ \
+     NO_PROXY=localhost,127.0.0.1,10.0.0.0/8 \
+     bash init_docker_proxy.sh
+```
+
+**注意事项：**
+- 脚本需要 root 权限执行
+- 需要先安装 Docker
+- 默认代理地址为 `http://127.0.0.1:7890/`
+- 配置完成后会重启 Docker 服务
+- 如需修改配置，可编辑 `/etc/systemd/system/docker.service.d/http-proxy.conf`
+
 ## 📝 通用下载格式
 
 所有脚本都可以通过以下格式从 GitHub 直接下载：
@@ -91,6 +130,7 @@ https://raw.githubusercontent.com/jingyijun/scripts/main/{脚本文件名}
 
 例如：
 - `https://raw.githubusercontent.com/jingyijun/scripts/main/init_lxc_noble.sh`
+- `https://raw.githubusercontent.com/jingyijun/scripts/main/init_docker_proxy.sh`
 
 ## 🔗 相关链接
 
