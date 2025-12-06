@@ -42,27 +42,58 @@ change_apt_source_to_tuna() {
   log_info "正在配置 APT 源为清华 TUNA..."
 
   local codename
-  codename="$(lsb_release -cs 2>/dev/null || echo noble)"
+  # 优先从 /etc/os-release 读取版本代号
+  if [[ -f /etc/os-release ]]; then
+    # 尝试读取 VERSION_CODENAME（Ubuntu 使用此字段）
+    codename="$(grep -E '^VERSION_CODENAME=' /etc/os-release 2>/dev/null | cut -d'=' -f2 | tr -d '"' || true)"
+    # 如果没有 VERSION_CODENAME，尝试 UBUNTU_CODENAME
+    if [[ -z "$codename" ]]; then
+      codename="$(grep -E '^UBUNTU_CODENAME=' /etc/os-release 2>/dev/null | cut -d'=' -f2 | tr -d '"' || true)"
+    fi
+  fi
+  
+  # 如果从 /etc/os-release 读取失败，尝试使用 lsb_release
+  if [[ -z "$codename" ]]; then
+    if command -v lsb_release >/dev/null 2>&1; then
+      codename="$(lsb_release -cs 2>/dev/null || true)"
+    fi
+  fi
+  
+  # 如果都失败，使用默认值
+  if [[ -z "$codename" ]]; then
+    codename="noble"
+    log_warn "无法检测发行版代号，使用默认值：noble"
+  else
+    log_info "检测到发行版代号：${codename}"
+  fi
 
   local src="/etc/apt/sources.list"
 
   if [[ -f "$src" ]]; then
     local i=0
     while [[ -f "${src}.bak.${i}" ]]; do
-      ((i++))
+      ((i++)) || true  # 防止算术表达式失败导致脚本退出
     done
-    cp "$src" "${src}.bak.${i}"
-    log_ok "已备份原 sources.list 为 ${src}.bak.${i}"
+    if cp "$src" "${src}.bak.${i}"; then
+      log_ok "已备份原 sources.list 为 ${src}.bak.${i}"
+    else
+      log_error "备份 sources.list 失败"
+      return 1
+    fi
   fi
 
-  cat >"$src" <<EOF
+  if cat >"$src" <<EOF
 deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ ${codename} main restricted universe multiverse
 deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ ${codename}-updates main restricted universe multiverse
 deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ ${codename}-backports main restricted universe multiverse
 deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ ${codename}-security main restricted universe multiverse
 EOF
-
-  log_ok "APT 源已切换到清华 TUNA（${codename}）"
+  then
+    log_ok "APT 源已切换到清华 TUNA（${codename}）"
+  else
+    log_error "写入 sources.list 失败"
+    return 1
+  fi
 }
 
 #######################################
