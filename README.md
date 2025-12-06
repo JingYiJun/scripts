@@ -1,0 +1,106 @@
+# JingYiJun Scripts 脚本仓库
+
+这个仓库用于备份和分享我的环境配置脚本，方便在不同机器上快速部署和恢复开发环境。
+
+## 📁 脚本列表
+
+- **init_lxc_noble.sh** - 一键初始化 Proxmox VE 上的 Ubuntu 24.04 LXC 容器环境
+  - 换源为清华 TUNA
+  - 更新系统
+  - 设置时区
+  - 安装 zsh + oh-my-zsh + 常用插件
+  - 配置中文 locale
+  - 安装 Docker
+  - 配置代理 alias
+
+## 📥 如何下载脚本
+
+### 方法一：使用 curl 直接下载并执行
+
+```bash
+# 下载并执行 init_lxc_noble.sh
+curl -fsSL https://raw.githubusercontent.com/jingyijun/scripts/main/init_lxc_noble.sh | bash
+
+# 镜像
+curl -fsSL https://github.akams.cn/https://raw.githubusercontent.com/jingyijun/scripts/main/init_lxc_noble.sh | bash
+
+# 或者先下载到本地再执行
+curl -fsSL https://raw.githubusercontent.com/jingyijun/scripts/main/init_lxc_noble.sh -o init_lxc_noble.sh
+chmod +x init_lxc_noble.sh
+sudo bash init_lxc_noble.sh
+```
+
+### 方法二：使用 wget 下载
+
+```bash
+# 下载脚本
+wget https://raw.githubusercontent.com/jingyijun/scripts/main/init_lxc_noble.sh
+
+# 添加执行权限
+chmod +x init_lxc_noble.sh
+
+# 执行脚本（需要 root 权限）
+sudo bash init_lxc_noble.sh
+```
+
+### 方法三：克隆整个仓库
+
+```bash
+# 克隆仓库
+git clone https://github.com/jingyijun/scripts.git
+cd scripts
+
+# 执行脚本
+sudo bash init_lxc_noble.sh
+```
+
+## 🔧 脚本使用说明
+
+### init_lxc_noble.sh
+
+用于在 Proxmox VE 的 Ubuntu 24.04 LXC 容器中快速初始化开发环境。
+
+**功能包括：**
+- ✅ 配置 APT 源为清华 TUNA 镜像
+- ✅ 更新和升级系统包
+- ✅ 设置时区为 Asia/Shanghai
+- ✅ 安装并配置 zsh、oh-my-zsh 及常用插件
+- ✅ 配置中文 locale (zh_CN.UTF-8)
+- ✅ 安装 Docker（使用 TUNA 镜像源）
+- ✅ 下载 pproxy 并配置 vpn/dvpn 代理 alias
+
+**使用方法：**
+
+```bash
+# 需要 root 权限运行
+sudo bash init_lxc_noble.sh
+```
+
+**注意事项：**
+- 脚本需要 root 权限执行
+- 部分操作（如设置默认 shell）在 LXC 环境中可能受限
+- 执行完成后建议重新登录终端以生效所有配置
+
+## 📝 通用下载格式
+
+所有脚本都可以通过以下格式从 GitHub 直接下载：
+
+```
+https://raw.githubusercontent.com/jingyijun/scripts/main/{脚本文件名}
+```
+
+例如：
+- `https://raw.githubusercontent.com/jingyijun/scripts/main/init_lxc_noble.sh`
+
+## 🔗 相关链接
+
+- [GitHub 仓库](https://github.com/jingyijun/scripts)
+- [清华 TUNA 镜像站](https://mirrors.tuna.tsinghua.edu.cn/)
+- [oh-my-zsh](https://ohmyz.sh/)
+
+## 📄 许可证
+
+本项目采用 [MIT License](LICENSE) 许可证。
+
+Copyright (c) 2025 JingYiJun
+
