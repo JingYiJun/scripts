@@ -13,6 +13,13 @@
   - 安装 Docker
   - 配置代理 alias
 
+- **init_ubuntu.sh** - 一键初始化 Ubuntu 系统环境（通用版本）
+  - 换源为清华 TUNA
+  - 更新系统
+  - 设置时区
+  - 安装 zsh + oh-my-zsh + 常用插件
+  - 配置中文 locale
+
 - **init_docker_proxy.sh** - 配置 Docker 代理设置
   - 创建 systemd 服务目录
   - 配置 HTTP/HTTPS 代理
@@ -88,6 +95,30 @@ sudo bash init_lxc_noble.sh
 - 部分操作（如设置默认 shell）在 LXC 环境中可能受限
 - 执行完成后建议重新登录终端以生效所有配置
 
+### init_ubuntu.sh
+
+用于在 Ubuntu 系统中快速初始化基础开发环境，适用于物理机、虚拟机或容器环境。
+
+**功能包括：**
+- ✅ 配置 APT 源为清华 TUNA 镜像
+- ✅ 更新和升级系统包
+- ✅ 设置时区为 Asia/Shanghai
+- ✅ 安装并配置 zsh、oh-my-zsh 及常用插件
+- ✅ 配置中文 locale (zh_CN.UTF-8)
+
+**使用方法：**
+
+```bash
+# 需要 root 权限运行
+sudo bash init_ubuntu.sh
+```
+
+**注意事项：**
+- 脚本需要 root 权限执行
+- 适用于所有 Ubuntu 版本（自动检测发行版代号）
+- 部分操作（如设置默认 shell）在某些环境中可能受限
+- 执行完成后建议重新登录终端以生效所有配置
+
 ### init_docker_proxy.sh
 
 用于配置 Docker 的 HTTP/HTTPS 代理设置，适用于需要通过代理访问 Docker Hub 或其他镜像仓库的场景。
@@ -130,6 +161,7 @@ https://raw.githubusercontent.com/jingyijun/scripts/main/{脚本文件名}
 
 例如：
 - `https://raw.githubusercontent.com/jingyijun/scripts/main/init_lxc_noble.sh`
+- `https://raw.githubusercontent.com/jingyijun/scripts/main/init_ubuntu.sh`
 - `https://raw.githubusercontent.com/jingyijun/scripts/main/init_docker_proxy.sh`
 
 ## 🔗 相关链接
