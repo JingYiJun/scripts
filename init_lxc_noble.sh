@@ -105,7 +105,7 @@ install_zsh_and_omz() {
     log_info "正在安装 oh-my-zsh ..."
     # 如需走代理，可改成 github.akams.cn 形式
     RUNZSH=no CHSH=no \
-    sh -c "$(curl -fsSL https://github.akams.cn/https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+    sh -c "$(REMOTE=https://github.akams.cn/https://github.com/ohmyzsh/ohmyzsh curl -fsSL https://github.akams.cn/https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
     log_ok "oh-my-zsh 安装完成"
   else
     log_info "检测到已安装 oh-my-zsh，跳过安装"
