@@ -27,6 +27,12 @@
   - 重载 systemd 并重启 Docker
   - 验证配置是否生效
 
+- **cursor_server.sh** - Cursor Remote Server 部署脚本
+  - 支持 SSH 别名和 user@host 格式
+  - 自动检测远程服务器架构和操作系统
+  - 下载并部署 Cursor CLI 和 Server 到远程服务器
+  - 支持跳过确认提示（-y 选项）
+
 ## 📥 如何下载脚本
 
 ### 方法一：使用 curl 直接下载并执行
@@ -151,6 +157,44 @@ sudo HTTP_PROXY=http://proxy.example.com:8080/ \
 - 配置完成后会重启 Docker 服务
 - 如需修改配置，可编辑 `/etc/systemd/system/docker.service.d/http-proxy.conf`
 
+### cursor_server.sh
+
+用于将 Cursor Remote Server 部署到远程服务器，支持自动检测远程服务器架构和操作系统，并下载对应的 Cursor CLI 和 Server 包。
+
+**功能包括：**
+- ✅ 自动获取本地 Cursor 版本信息
+- ✅ 自动检测远程服务器架构（x64/arm64）和操作系统（linux/darwin）
+- ✅ 下载 Cursor CLI 和 VSCODE Server 包到临时目录
+- ✅ 上传并部署到远程服务器
+- ✅ 支持 SSH 别名和 user@host 格式
+- ✅ 支持跳过确认提示（-y 选项）
+- ✅ 自动清理临时文件
+
+**使用方法：**
+
+```bash
+# 基本用法（需要确认）
+./cursor_server.sh user@host
+# 或使用 SSH 别名
+./cursor_server.sh my-server
+
+# 跳过确认提示，直接执行
+./cursor_server.sh -y user@host
+# 或
+./cursor_server.sh --yes my-server
+
+# 显示帮助信息
+./cursor_server.sh -h
+```
+
+**注意事项：**
+- 需要本地已安装 Cursor 并可通过 `cursor --version` 获取版本信息
+- 需要配置好 SSH 免密登录或使用密码认证
+- 远程服务器需要安装 wget 或 curl
+- 脚本会自动检测远程服务器架构，支持 x64 和 arm64
+- 脚本会自动检测远程操作系统，支持 linux 和 darwin
+- 部署路径为 `~/.cursor-server/cli/servers/Stable-{COMMIT}/server/`
+
 ## 📝 通用下载格式
 
 所有脚本都可以通过以下格式从 GitHub 直接下载：
@@ -163,6 +207,7 @@ https://raw.githubusercontent.com/jingyijun/scripts/main/{脚本文件名}
 - `https://raw.githubusercontent.com/jingyijun/scripts/main/init_lxc_noble.sh`
 - `https://raw.githubusercontent.com/jingyijun/scripts/main/init_ubuntu.sh`
 - `https://raw.githubusercontent.com/jingyijun/scripts/main/init_docker_proxy.sh`
+- `https://raw.githubusercontent.com/jingyijun/scripts/main/cursor_server.sh`
 
 ## 🔗 相关链接
 
