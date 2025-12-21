@@ -109,16 +109,41 @@ apt_update_upgrade() {
 # 3. 设置时区为 Asia/Shanghai
 #######################################
 set_timezone() {
-  log_info "正在设置时区为 Asia/Shanghai ..."
+  local timezone="${TIMEZONE:-Asia/Shanghai}"
+  log_info "正在设置时区为 ${timezone} ..."
+
+  # 方案 A：systemd 环境（timedatectl）
   if command -v timedatectl >/dev/null 2>&1; then
-    if timedatectl set-timezone Asia/Shanghai 2>/dev/null; then
-      log_ok "时区已设置为 Asia/Shanghai"
-    else
-      log_warn "timedatectl 设置时区失败，某些环境可能不允许修改时区"
+    if timedatectl set-timezone "${timezone}" 2>/dev/null; then
+      log_ok "时区已设置为 ${timezone}"
+      return 0
     fi
-  else
-    log_warn "timedatectl 不存在，跳过时区设置"
+    log_warn "timedatectl 设置时区失败，某些环境可能不允许修改时区，尝试不依赖 systemd 的方案"
   fi
+
+  # 方案 B：不依赖 systemd（写 /etc/localtime + /etc/timezone）
+  local zoneinfo="/usr/share/zoneinfo/${timezone}"
+  if [[ ! -e "${zoneinfo}" ]]; then
+    log_warn "未找到时区文件：${zoneinfo}（可能未安装 tzdata），跳过时区设置"
+    log_warn "可尝试：apt-get install -y tzdata"
+    return 0
+  fi
+
+  # /etc/localtime 可能是文件或软链接；用 ln -sf 覆盖即可
+  if ln -sf "${zoneinfo}" /etc/localtime 2>/dev/null; then
+    log_ok "已设置 /etc/localtime -> ${zoneinfo}"
+  else
+    log_warn "写入 /etc/localtime 失败（可能是只读文件系统/受限容器），无法持久化设置时区"
+    log_warn "临时方案：在当前进程/容器里设置环境变量 TZ=${timezone}"
+    return 0
+  fi
+
+  # 某些程序会读取 /etc/timezone（Debian/Ubuntu 常见）
+  if [[ -w /etc/timezone ]] || [[ ! -e /etc/timezone && -w /etc ]]; then
+    echo "${timezone}" >/etc/timezone 2>/dev/null || true
+  fi
+
+  log_ok "时区已设置为 ${timezone}（无需 systemd）"
 }
 
 #######################################
@@ -134,7 +159,7 @@ install_zsh_and_omz() {
     log_info "正在安装 oh-my-zsh ..."
     # 如需走代理，可改成 github.akams.cn 形式
     RUNZSH=no CHSH=no \
-    sh -c "$(curl -fsSL https://github.akams.cn/https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+    sh -c "$(curl -fsSL https://gh-proxy.org/https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
     log_ok "oh-my-zsh 安装完成"
   else
     log_info "检测到已安装 oh-my-zsh，跳过安装"
@@ -146,7 +171,7 @@ install_zsh_and_omz() {
 
   if [[ ! -d "${zsh_custom}/plugins/zsh-syntax-highlighting" ]]; then
     log_info "正在安装插件 zsh-syntax-highlighting ..."
-    git clone https://github.akams.cn/https://github.com/zsh-users/zsh-syntax-highlighting.git \
+    git clone https://gh-proxy.org/https://github.com/zsh-users/zsh-syntax-highlighting.git \
       "${zsh_custom}/plugins/zsh-syntax-highlighting"
   else
     log_info "插件 zsh-syntax-highlighting 已存在，跳过"
@@ -154,7 +179,7 @@ install_zsh_and_omz() {
 
   if [[ ! -d "${zsh_custom}/plugins/zsh-autosuggestions" ]]; then
     log_info "正在安装插件 zsh-autosuggestions ..."
-    git clone https://github.akams.cn/https://github.com/zsh-users/zsh-autosuggestions.git \
+    git clone https://gh-proxy.org/https://github.com/zsh-users/zsh-autosuggestions.git \
       "${zsh_custom}/plugins/zsh-autosuggestions"
   else
     log_info "插件 zsh-autosuggestions 已存在，跳过"
