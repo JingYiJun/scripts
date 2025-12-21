@@ -206,7 +206,12 @@ EOF
   log_ok "~/.zshrc 中 plugins 已设置为：git ssh zsh-syntax-highlighting zsh-autosuggestions"
 
   # 设置默认 shell 为 zsh
-  local target_user="${SUDO_USER:-$USER}"
+  # 注意：脚本启用了 set -u，$USER 在某些非登录/容器环境可能未定义
+  # 优先使用 sudo 传入的原始用户，其次尝试 LOGNAME/USER，最后回退到 id -un
+  local target_user="${SUDO_USER:-${LOGNAME:-${USER:-}}}"
+  if [[ -z "${target_user}" ]]; then
+    target_user="$(id -un)"
+  fi
   local zsh_path
   zsh_path="$(command -v zsh)"
   if [[ -n "$zsh_path" ]]; then
